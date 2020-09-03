@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Query MyAccount</title>
+<style type="text/css">
+	body{
+		margin:100px;
+		background-color:grey;
+	}
+	tr.title{
+		font-size:150%;
+		background-color:yellow;
+		border:10px solid #ddd;
+	}
+	table { 
+            border-collapse: collapse; 
+            width: 100%; 
+        } 
+  
+        th, 
+        td { 
+            padding: 8px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+        } 
+	
+	
+</style>
+</head>
+<body>
+
+	 <input type="Button" value="Load From Data" class="load">
+	<table class="table_click">
+	<tr class="title">
+		<th>Account</th>
+		<th>Password</th>
+		<th>Note</th>
+	</tr>
+	<tr id="1">
+		<td>user1</td>
+		<td>pass1</td>
+		<td>note1</td>
+	</tr>
+	<tr id="2">
+		<td>user2</td>
+		<td>pass2</td>
+		<td>note2</td>
+	</tr>
+	
+	</table>
+
+	<script>
+		
+		let id1 = document.getElementById("#1");
+		let id2 = document.getElementById("#2");
+		let tableClick=document.querySelector('.table_click');
+		//let loadbtn = document.querySelector('.load');
+		
+		
+		tableClick.addEventListener('click', load);
+		
+		function load(item){
+			var row = item.path[1];
+			var row_value="";
+			   for (var j = 0; j < row.cells.length; j++) { 
+				   
+                   row_value += row.cells[j].innerHTML; 
+                   row_value += " | "; 
+            
+               } 
+ 
+		       console.log(row_value);
+		}
+	
+	</script>
+</body>
+</html>
