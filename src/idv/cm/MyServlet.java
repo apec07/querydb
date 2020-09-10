@@ -42,7 +42,7 @@ public class MyServlet extends HttpServlet {
 				Integer key = user.get_id();
 //				table.put(Integer.valueOf(key), user);
 			}
-//			valueSet.forEach(s->System.out.println(s));
+			valueSet.forEach(s->System.out.println(s));
 			return valueSet;
 		}else {
 			return null;

@@ -44,6 +44,8 @@
 	<textarea placeholder ="Search for pass" ></textarea>
 	<textarea placeholder ="Search for note" ></textarea>
 	</div>
+	
+	<%-- 
    <form action="hello" method="post">
    <input type="submit" value="Submit(JSTL)" class="load">
    <table class="query_db1">
@@ -72,7 +74,7 @@
    </tbody>
    </table>
    </form>
-
+ --%>
 	<br>
 	<form action="hello" method="post">
 	<input type="Button" value="Button(JS)" class="load">
