@@ -18,6 +18,10 @@
 		background-color:yellow;
 		border:5px solid #ddd;
 	}
+	
+	textarea {
+	    border:5px solid #ddd;
+	}
 	table { 
             border-collapse: collapse;
             width: 100%; 
@@ -34,7 +38,11 @@
 </style>
 </head>
 <body>
-
+	<div class="search">
+	<textarea placeholder ="Search for name"></textarea>
+	<textarea placeholder ="Search for pass" ></textarea>
+	<textarea placeholder ="Search for note" ></textarea>
+	</div>
 	<form action="hello" method="post">
 	<input type="Button" value="Button(JS)" class="load">
 	<input type="submit" value="Submit(form)" class="load">
