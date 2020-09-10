@@ -35,8 +35,9 @@
 </head>
 <body>
 
-	<input type="Button" value="Load From Data" class="load">
-	<form action="MyServlet" method="post">
+	<form action="hello" method="post">
+	<input type="Button" value="Button(JS)" class="load">
+	<input type="submit" value="Submit(form)" class="load">
 	<table class="query_db">
 	<thead>
 	<tr class="title">
@@ -45,11 +46,15 @@
 		<th>Note</th>
 	</tr>
 	</thead>
+	<tbody>
 	<%
 	List<UserBean> list = (List<UserBean>) request.getAttribute("listA");	
     String name="";
     String phone="";
     String note="";
+    if(list==null ||list.size()==0){
+    	return;
+    }
 
     for (int i = 0; i < list.size(); i++) {
     name = list.get(i).getUserName();
@@ -59,17 +64,15 @@
     %>
     <tr>
         <td><%= name %></td>
-    </tr>
-    <tr>
+    
         <td><%= phone %></td>
-    </tr>
-    <tr>
+  
         <td><%= note %></td>
     </tr>
     <% } %> 
 
 	
-	<tbody>
+	
 	
 	<c:forEach items="${list}" var="user">
  	
