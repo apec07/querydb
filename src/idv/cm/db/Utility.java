@@ -2,6 +2,9 @@
 package idv.cm.db;
 import java.io.*;
 import java.util.*;
+
+import idv.cm.UserBean;
+
 import java.sql.*;
 
 public class Utility {
@@ -40,7 +43,7 @@ public class Utility {
 		return account;
 	}
 
-	public static boolean MySQLConnect(){
+	public static boolean connectMySQL(){
 		 try {
             Class.forName("com.mysql.jdbc.Driver"); 
         } catch (java.lang.ClassNotFoundException e) {
@@ -90,19 +93,19 @@ public class Utility {
 		return true;
 	}
 	
-	public static List<Account> readFromMySQL(){
+	public static HashSet<UserBean> readFromMySQL(){
 		
-		List<Account> mList = new ArrayList<>();
+		HashSet<UserBean> set = new LinkedHashSet<>();
 		
 		 try {
-        		Properties prop = new Properties();
-            prop.load(new FileInputStream("JDBC.properties"));
-            Connection con =  DriverManager.getConnection("jdbc:mysql://localhost:3306/db_morgan?"+"autoReconnect=true&useSSL=false", prop);
+//        		Properties prop = new Properties();
+//            prop.load(new FileInputStream("JDBC.properties"));
+            Connection con =  DriverManager.getConnection("jdbc:mysql://localhost:3306/db_morgan?"+"autoReconnect=true&useSSL=false", "root","1234");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * from account");
-
+   
             while (rs.next()) {
-            		Account account = new Account();
+                UserBean account = new UserBean.Builder().build();
                 int _id = rs.getInt(1);
                 String user = rs.getString(2);
                 String password = rs.getString(3);
@@ -113,11 +116,12 @@ public class Utility {
                 System.out.print(" Password= " + password);
                 System.out.print(" Note= " + note);
                 System.out.print("\n");
-                account.setId(_id);
-                account.setUser(user);
-                account.setPassword(password);
-                account.setNote(note);
-                mList.add(account);
+                account.set_id(_id);
+                account.setUserName(user);
+                account.setUserPass(password);
+                account.setUserNote(note);
+                set.add(account);
+                
             }
 
             rs.close();
@@ -129,16 +133,16 @@ public class Utility {
             return null;
         }
         
-        return mList;
+        return set;
 	}
 	
-	public static int writeToMySQL(Account account,int type){
+	public static int writeToMySQL(UserBean account,int type){
 		int updateNum;
 		System.out.println("WriteToMySQL account = "+account+"\n");
-		int id=account.getId();
-		String user = account.getUser();
-		String password = account.getPassword();
-		String note = account.getNote();
+		int id=account.get_id();
+		String user = account.getUserName();
+		String password = account.getUserPass();
+		String note = account.getUserNote();
 		String sqlUrl="";
 		System.out.println("WriteToMySQL account id= "+id);
 		System.out.println("WriteToMySQL account user= "+user);
@@ -150,13 +154,13 @@ public class Utility {
 		}
 		switch (type){
 			case 0://type 0
-				id = account.getId();
+				id = account.get_id();
 				System.out.println("WriteToMySQL update id = "+id);
 				sqlUrl = "UPDATE ACCOUNT SET USER=\""+user+"\", PASSWORD=\""+password+"\", NOTE=\""+note+"\" WHERE ID = "+id+";";
 				break;
 				
 			case 1://type 1
-				id = account.getId();
+				id = account.get_id();
 				sqlUrl = "DELETE FROM ACCOUNT WHERE ID = "+id+" ;";
 				break;
 				
@@ -189,12 +193,12 @@ public class Utility {
 		return updateNum;
 	}
 	
-	public static int preparedWriteToMySQL(Account account,int type){
+	public static int preparedWriteToMySQL(UserBean account,int type){
 		int updateNum=0;
-		int id=account.getId();
-		String user = account.getUser();
-		String password = account.getPassword();
-		String note = account.getNote();
+		int id=account.get_id();
+		String user = account.getUserName();
+		String password = account.getUserPass();
+		String note = account.getUserNote();
 		String sqlUrl="";
 		
 		if(type==0){

@@ -62,7 +62,7 @@ class MySQLConnect {
 
         try {
         		Properties prop = new Properties();
-            prop.load(new FileInputStream("JDBC.properties"));
+            prop.load(new FileInputStream("/JDBC.properties"));
             Connection con =  DriverManager.getConnection("jdbc:mysql://localhost:3306/db_morgan?"+"autoReconnect=true&useSSL=false", prop);
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * from account");

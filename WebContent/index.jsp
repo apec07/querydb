@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql"%>
 <%@page import="java.util.*"%>
 <%@page import="idv.cm.UserBean"%>
 <!DOCTYPE html>
@@ -43,11 +44,41 @@
 	<textarea placeholder ="Search for pass" ></textarea>
 	<textarea placeholder ="Search for note" ></textarea>
 	</div>
+   <form action="hello" method="post">
+   <input type="submit" value="Submit(JSTL)" class="load">
+   <table class="query_db1">
+	<thead>	
+	<tr class="title">
+		<th>Account</th>
+		<th>Password</th>
+		<th>Note</th>
+	</tr>
+	</thead>
+	<tbody>
+   <sql:setDataSource var="snapshot" driver="com.mysql.jdbc.Driver"
+     url="jdbc:mysql://localhost:3306/db_morgan"
+     user="root"  password="1234"/>
+     <sql:query dataSource="${snapshot}" var="result">
+		SELECT * from account;
+	</sql:query>
+  <c:forEach var="row" items="${result.rows}">
+<tr>
+   <td><c:out value="${row._id}"/></td>
+   <td><c:out value="${row.user}"/></td>
+   <td><c:out value="${row.password}"/></td>
+   <td><c:out value="${row.note}"/></td>
+</tr>
+</c:forEach>
+   </tbody>
+   </table>
+   </form>
+
+	<br>
 	<form action="hello" method="post">
 	<input type="Button" value="Button(JS)" class="load">
 	<input type="submit" value="Submit(form)" class="load">
 	<table class="query_db">
-	<thead>
+	<thead>	
 	<tr class="title">
 		<th>Account</th>
 		<th>Password</th>
@@ -56,41 +87,36 @@
 	</thead>
 	<tbody>
 	<%
-	List<UserBean> list = (List<UserBean>) request.getAttribute("listA");	
+	//Hashtable<Integer,UserBean> table = (Hashtable<Integer,UserBean>) request.getAttribute("listA");
+	HashSet<UserBean> valueSet = (HashSet<UserBean>) request.getAttribute("listA");	
+	Integer id=-1;
     String name="";
-    String phone="";
+    String pass="";
     String note="";
-    if(list==null ||list.size()==0){
+    if(valueSet==null ||valueSet.size()==0){
+    	out.println("table not ready");
     	return;
     }
-
-    for (int i = 0; i < list.size(); i++) {
-    name = list.get(i).getUserName();
-    phone=list.get(i).getUserPhone();
-    note=list.get(i).getUserNote();
+	out.println(valueSet.size()+"\n");
+	//LinkedHashSet<UserBean> users = (LinkedHashSet)table.values();
+	Iterator<UserBean> its = valueSet.iterator();
+	while(its.hasNext()){
+		UserBean user = its.next();
+		id = user.get_id();
+		name = user.getUserName();
+		pass = user.getUserPass();
+		note = user.getUserNote();
+	}
+	
 
     %>
     <tr>
         <td><%= name %></td>
     
-        <td><%= phone %></td>
+        <td><%= pass %></td>
   
         <td><%= note %></td>
     </tr>
-    <% } %> 
-
-	
-	
-	
-	<c:forEach items="${list}" var="user">
- 	
- 	<tr>
-    <td><c:out value="${user.getUserName()}"/></td>
-    <td><c:out value="${user.getUserPhone()}"/></td>
-    <td><c:out value="${user.getUserNote()}"/></td>
-  	</tr>
-  	</c:forEach>   
-
 	</tbody>
 	</table>
 	</form>
