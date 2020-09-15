@@ -1,10 +1,15 @@
 // Utility for Account
 package idv.cm.db;
 import java.io.*;
+
 import java.util.*;
 import java.util.Date;
-import java.util.logging.FileHandler;
+
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Properties;
 import java.util.logging.Formatter;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -16,7 +21,7 @@ import java.text.SimpleDateFormat;
 
 public class Utility {
 	
-	public static	Logger getLogger(String name,String msg) {
+	public static Logger getLogger(String name,String msg) {
 		//consloe log
 		Logger log = Logger.getLogger(name);
 		log.setLevel(Level.INFO);
@@ -54,6 +59,34 @@ public class Utility {
     log1.severe(currentStamp+"\twarning級別打印：severe級別日誌信息 :\t"+msg);
 		
 	}
+
+	public static void writeLogger(String msg)throws SecurityException, IOException {
+		// write to path	
+		long currentMilli = System.currentTimeMillis();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		java.util.Date date = new java.util.Date(currentMilli);
+		String currentStamp = sdf.format(date).toString();
+		Logger log1 = Logger.getLogger("MyServlet");
+	        
+	    FileHandler fileHandler = new FileHandler("d:/myLog/testLog%g.log",true);
+	    fileHandler.setLevel(Level.WARNING);
+	    fileHandler.setFormatter(new Formatter() {
+	    	 @Override
+		        public String format(LogRecord record) {
+		            return record.getLoggerName() 
+		                    + ">>"
+		                    +record.getLevel()
+		                    +">>"
+		                    +record.getMessage()
+		                    +"\n"
+		                    ;
+		        }
+	    });
+	    log1.addHandler(fileHandler);
+	        
+	    log1.severe(currentStamp+"\twarning - severe:>\t" + msg);
+			
+		}
 
 	public static boolean writeToFile (String pathName,Account account){
 		try {
@@ -95,6 +128,7 @@ public class Utility {
         } catch (java.lang.ClassNotFoundException e) {
             System.err.print("ClassNotFoundException: ");
             System.err.println(e.getMessage());
+            
             return false;
         }
         return true;
@@ -138,8 +172,8 @@ public class Utility {
 		
 		return true;
 	}
-	
-	public static HashSet<UserBean> readFromMySQL() throws IOException{
+
+	public static HashSet<UserBean> readFromMySQL() throws SecurityException, IOException{
 		
 		HashSet<UserBean> set = new LinkedHashSet<>();
 		
@@ -149,7 +183,7 @@ public class Utility {
             Connection con =  DriverManager.getConnection("jdbc:mysql://localhost:3306/db_morgan?"+"autoReconnect=true&useSSL=false", "root","1234");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * from account");
-   
+            
             while (rs.next()) {
                 UserBean account = new UserBean.Builder().build();
                 int _id = rs.getInt(1);
@@ -177,6 +211,7 @@ public class Utility {
         } catch (Exception ex) {
         	   writeLogger("Utility - ReadSQLException",ex.toString());
             System.err.println("SQLException: " + ex.getMessage());
+            writeLogger(ex.toString());
             return null;
         }
         

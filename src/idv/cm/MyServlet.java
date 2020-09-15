@@ -1,6 +1,7 @@
 package idv.cm;
 
 import java.io.IOException;
+
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import idv.cm.db.Utility;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Servlet implementation class ServletLogin
@@ -25,18 +28,18 @@ public class MyServlet extends HttpServlet {
 	private List<UserBean> list = UserBean.createUserList();
 	
 	private RequestDispatcher rd;
+	public Logger log1,log2,log3;
 	
 	//retrieve from db
 	private HashSet<UserBean> valueSet;
 //	private Hashtable<Integer,UserBean> table = new Hashtable<>();
 	
-	public HashSet<UserBean> getMyDb() throws IOException{
-		Utility.writeLogger(this.getServletInfo(),"getMyDb method ");
+	public HashSet<UserBean> getMyDb() throws SecurityException, IOException{
 		//check connection
 		boolean isConnect = Utility.connectMySQL();
 		if(isConnect) {
 			Utility.writeLogger(this.getServletInfo(),"isConnect = "+isConnect);
-			; //make sure table is created!
+            //make sure table is created!
 			Utility.writeLogger(this.getServletInfo(),"isCreateTable = "+Utility.createTable());
 			valueSet = Utility.readFromMySQL();
 			Iterator<UserBean> it = valueSet.iterator();
@@ -47,6 +50,7 @@ public class MyServlet extends HttpServlet {
 //				table.put(Integer.valueOf(key), user);
 			}
 			
+//			valueSet.forEach(s->System.out.println(s));
 			return valueSet;
 		}else {
 			return null;
@@ -64,9 +68,12 @@ public class MyServlet extends HttpServlet {
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		super.service(request, response);
-		
+//		super.service(request, response);
+		valueSet=getMyDb();
+		request.setAttribute("listA", valueSet);
+		rd = getServletContext().getRequestDispatcher("/index.jsp");
+		rd.forward(request, response);
 	}
 
 	/**
@@ -90,7 +97,7 @@ public class MyServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doGet(request, response);
+//		doGet(request, response);
 	}
 
 }

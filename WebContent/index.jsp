@@ -19,6 +19,9 @@
 		background-color:yellow;
 		border:5px solid #ddd;
 	}
+	td#id{
+		display:none;
+	}
 	
 	textarea {
 	    border:5px solid #ddd;
@@ -91,35 +94,35 @@
 	<%
 	//Hashtable<Integer,UserBean> table = (Hashtable<Integer,UserBean>) request.getAttribute("listA");
 	HashSet<UserBean> valueSet = (HashSet<UserBean>) request.getAttribute("listA");	
-	Integer id=-1;
+	int id=-1;
     String name="";
     String pass="";
     String note="";
     if(valueSet==null ||valueSet.size()==0){
-    	out.println("table not ready");
+    	out.print("valueSet = "+valueSet);
+    	out.println("\n"+"table not ready");
     	return;
     }
 	out.println(valueSet.size()+"\n");
+	
 	//LinkedHashSet<UserBean> users = (LinkedHashSet)table.values();
 	Iterator<UserBean> its = valueSet.iterator();
 	while(its.hasNext()){
 		UserBean user = its.next();
+	    
 		id = user.get_id();
 		name = user.getUserName();
 		pass = user.getUserPass();
 		note = user.getUserNote();
-	
-	
-
     %>
     <tr>
+		<td id='id'><%= id %></td>
         <td><%= name %></td>
-    
         <td><%= pass %></td>
-  
         <td><%= note %></td>
-    </tr> 
+  	</tr>
     <% } %>
+    <%-- 
     <c:forEach items="${listA}" var="user">
  	<tr>
     <td><c:out value="${user.getUserName()}"/></td>
@@ -127,15 +130,16 @@
     <td><c:out value="${user.getUserNote()}"/></td>
   	</tr>
   	</c:forEach>   
-    
-    
+    --%>
+	
 	</tbody>
 	</table>
 	</form>
-	
+
 
 	<script>
-		
+	
+	
 		let id1 = document.getElementById("#1");
 		let id2 = document.getElementById("#2");
 		let tableClick=document.querySelector('.query_db');
@@ -146,14 +150,15 @@
 		
 		function load(item){
 			var row = item.path[1];
+			var id ="";
 			var row_value="";
 			   for (var j = 0; j < row.cells.length; j++) { 
-				   
+				   id = row.cells[0].innerHTML; 
                    row_value += row.cells[j].innerHTML; 
                    row_value += " | "; 
-            
+       
                } 
- 
+ 			   console.log('id - '+id);
 		       console.log(row_value);
 		}
 	
