@@ -108,7 +108,7 @@
 		name = user.getUserName();
 		pass = user.getUserPass();
 		note = user.getUserNote();
-	}
+	
 	
 
     %>
@@ -118,7 +118,17 @@
         <td><%= pass %></td>
   
         <td><%= note %></td>
-    </tr>
+    </tr> 
+    <% } %>
+    <c:forEach items="${listA}" var="user">
+ 	<tr>
+    <td><c:out value="${user.getUserName()}"/></td>
+    <td><c:out value="${user.getUserPass()}"/></td>
+    <td><c:out value="${user.getUserNote()}"/></td>
+  	</tr>
+  	</c:forEach>   
+    
+    
 	</tbody>
 	</table>
 	</form>

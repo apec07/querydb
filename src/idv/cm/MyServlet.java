@@ -30,19 +30,23 @@ public class MyServlet extends HttpServlet {
 	private HashSet<UserBean> valueSet;
 //	private Hashtable<Integer,UserBean> table = new Hashtable<>();
 	
-	public HashSet<UserBean> getMyDb(){
+	public HashSet<UserBean> getMyDb() throws IOException{
+		Utility.writeLogger(this.getServletInfo(),"getMyDb method ");
 		//check connection
 		boolean isConnect = Utility.connectMySQL();
 		if(isConnect) {
-			Utility.createAccount(); //make sure table is created!
+			Utility.writeLogger(this.getServletInfo(),"isConnect = "+isConnect);
+			; //make sure table is created!
+			Utility.writeLogger(this.getServletInfo(),"isCreateTable = "+Utility.createTable());
 			valueSet = Utility.readFromMySQL();
 			Iterator<UserBean> it = valueSet.iterator();
 			while(it.hasNext()) {
 				UserBean user = it.next();
+				Utility.writeLogger(this.getServletInfo(),"user = "+user);
 				Integer key = user.get_id();
 //				table.put(Integer.valueOf(key), user);
 			}
-			valueSet.forEach(s->System.out.println(s));
+			
 			return valueSet;
 		}else {
 			return null;
@@ -54,6 +58,7 @@ public class MyServlet extends HttpServlet {
      */
     public MyServlet() {
         super();
+        
         // TODO Auto-generated constructor stub
     }
 
@@ -61,9 +66,7 @@ public class MyServlet extends HttpServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		super.service(request, response);
-		request.setAttribute("listA", valueSet);
-		rd = getServletContext().getRequestDispatcher("/index.jsp");
-		rd.forward(request, response);
+		
 	}
 
 	/**
@@ -76,7 +79,10 @@ public class MyServlet extends HttpServlet {
 		
 //		  request.setAttribute("listA", list);
 //	      request.getRequestDispatcher("/index.jsp").forward(request, response);
-		
+		valueSet = getMyDb();
+		request.setAttribute("listA", valueSet);
+		rd = getServletContext().getRequestDispatcher("/index.jsp");
+		rd.forward(request, response);
 	}
 
 	/**

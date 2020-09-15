@@ -2,12 +2,58 @@
 package idv.cm.db;
 import java.io.*;
 import java.util.*;
+import java.util.Date;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import idv.cm.UserBean;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 public class Utility {
+	
+	public static	Logger getLogger(String name,String msg) {
+		//consloe log
+		Logger log = Logger.getLogger(name);
+		log.setLevel(Level.INFO);
+		log.info(msg);
+		
+		return log;
+	}
+	
+	public static void writeLogger(String className,String msg) throws SecurityException, IOException {
+		//get currentDate&Time
+		long current = System.currentTimeMillis();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		Date date = new Date(current);
+		String currentStamp = sdf.format(date);
+		
+	  //write to path	
+		Logger log1 = Logger.getLogger(className);
+        
+    FileHandler fileHandler = new FileHandler("d:/myLogs/testLog%g.log",true);
+    fileHandler.setLevel(Level.WARNING);
+    fileHandler.setFormatter(new Formatter(){
+    	 @Override
+        public String format(LogRecord record) {
+            return record.getLoggerName() 
+                    + ">>"
+                    +record.getLevel()
+                    +">>"
+                    +record.getMessage()
+                    +"\n"
+                    ;
+        }
+    });
+    log1.addHandler(fileHandler);
+    
+    log1.severe(currentStamp+"\twarning級別打印：severe級別日誌信息 :\t"+msg);
+		
+	}
 
 	public static boolean writeToFile (String pathName,Account account){
 		try {
@@ -65,7 +111,7 @@ public class Utility {
 		return false;
 	}
 	
-	public static boolean createAccount(){
+	public static boolean createTable(){
 		
 		String sqlUrl="CREATE TABLE IF NOT EXISTS ACCOUNT ("+
 		"ID INT NOT NULL AUTO_INCREMENT,"+
@@ -76,9 +122,9 @@ public class Utility {
 		boolean isTableCreated = false;
 		
 				try {
-        		Properties prop = new Properties();
-            prop.load(new FileInputStream("JDBC.properties"));
-            Connection con =  DriverManager.getConnection("jdbc:mysql://localhost:3306/db_morgan?"+"autoReconnect=true&useSSL=false", prop);
+//        		Properties prop = new Properties();
+//            prop.load(new FileInputStream("JDBC.properties"));
+            Connection con =  DriverManager.getConnection("jdbc:mysql://localhost:3306/db_morgan?"+"autoReconnect=true&useSSL=false", "root","1234");
             Statement stmt = con.createStatement();
             stmt.executeUpdate(sqlUrl);
          
@@ -93,7 +139,7 @@ public class Utility {
 		return true;
 	}
 	
-	public static HashSet<UserBean> readFromMySQL(){
+	public static HashSet<UserBean> readFromMySQL() throws IOException{
 		
 		HashSet<UserBean> set = new LinkedHashSet<>();
 		
@@ -121,7 +167,7 @@ public class Utility {
                 account.setUserPass(password);
                 account.setUserNote(note);
                 set.add(account);
-                
+                writeLogger("Utility - ReadSQL","User = "+account);
             }
 
             rs.close();
@@ -129,6 +175,7 @@ public class Utility {
             con.close();
 
         } catch (Exception ex) {
+        	   writeLogger("Utility - ReadSQLException",ex.toString());
             System.err.println("SQLException: " + ex.getMessage());
             return null;
         }
