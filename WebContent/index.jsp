@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql"%>
 <%@page import="java.util.*"%>
-<%@page import="idv.cm.UserBean"%>
+<%@page import="idv.cm.db.UserVO"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -79,9 +79,39 @@
    </form>
  --%>
 	<br>
+<dialog id="newDialog">
+  <form action="hello" method="post" >
+    <p><label><em>New User</em></label></p>
+    <p><label>Name : </label><input type="text" id="name" name="name" placeholder=""></p>
+    <p><label>Pass : </label><input type="text" id="pass" name="pass" placeholder=""></p>
+    <p><label>Note : </label><input type="text" id="note" name="note" placeholder=""></p>
+    <menu>
+      <button value="cancel">Cancel</button>
+      <input type="submit" value="Submit"></input>
+    </menu>
+  </form>
+</dialog>
+<dialog id="updateDialog">
+  <form action="hello" method="post" >
+    <p><label><em>Update</em></label></p>
+    <p><label>Name : </label><input type="text" name="name" placeholder="">${user.getUserName()}</p>
+    <p><label>Pass : </label><input type="text" name="pass" placeholder="">${user.getpass()}</p>
+    <p><label>Note : </label><input type="text" name="note" placeholder="">${user.getUserName()}</p>
+    <menu>
+      <button value="cancel">Cancel</button>
+      <input type="submit" value="Update"></input>
+    </menu>
+  </form>
+</dialog>
+
+<menu>
+  <button id="newUser">New User</button>
+</menu>
+
+<output aria-live="polite"></output>
+
 	<form action="hello" method="post">
-	<input type="Button" value="Button(JS)" class="load">
-	<input type="submit" value="Submit(form)" class="load">
+	<input type="submit" value="Refresh" class="load">
 	<table class="query_db">
 	<thead>	
 	<tr class="title">
@@ -92,30 +122,30 @@
 	</thead>
 	<tbody>
 	<%
-	//Hashtable<Integer,UserBean> table = (Hashtable<Integer,UserBean>) request.getAttribute("listA");
-	HashSet<UserBean> valueSet = (HashSet<UserBean>) request.getAttribute("listA");	
-	int id=-1;
-    String name="";
-    String pass="";
-    String note="";
-    if(valueSet==null ||valueSet.size()==0){
-    	out.print("valueSet = "+valueSet);
-    	out.println("\n"+"table not ready");
-    	return;
-    }
-	out.println(valueSet.size()+"\n");
-	
-	//LinkedHashSet<UserBean> users = (LinkedHashSet)table.values();
-	Iterator<UserBean> its = valueSet.iterator();
-	while(its.hasNext()){
-		UserBean user = its.next();
-	    
-		id = user.get_id();
-		name = user.getUserName();
-		pass = user.getUserPass();
-		note = user.getUserNote();
-    %>
-    <tr>
+		//Hashtable<Integer,UserBean> table = (Hashtable<Integer,UserBean>) request.getAttribute("listA");
+		HashSet<UserVO> valueSet = (HashSet<UserVO>) request.getAttribute("listA");	
+		int id=-1;
+	    String name="";
+	    String pass="";
+	    String note="";
+	    if(valueSet==null ||valueSet.size()==0){
+	    	out.print("valueSet = "+valueSet);
+	    	out.println("\n"+"table not ready");
+	    	return;
+	    }
+		out.println(valueSet.size()+"\n");
+		
+		//LinkedHashSet<UserBean> users = (LinkedHashSet)table.values();
+		Iterator<UserVO> its = valueSet.iterator();
+		while(its.hasNext()){
+			UserVO user = its.next();
+		    
+			id = user.get_id();
+			name = user.getUserName();
+			pass = user.getUserPass();
+			note = user.getUserNote();
+	%>
+    <tr>	
 		<td id='id'><%= id %></td>
         <td><%= name %></td>
         <td><%= pass %></td>
@@ -139,15 +169,9 @@
 
 	<script>
 	
-	
-		let id1 = document.getElementById("#1");
-		let id2 = document.getElementById("#2");
-		let tableClick=document.querySelector('.query_db');
-		//let loadbtn = document.querySelector('.load');
-		
-		
+		let tableClick=document.querySelector('.query_db');	
 		tableClick.addEventListener('click', load);
-		
+		const updateDialog = document.getElementById('updateDialog');
 		function load(item){
 			var row = item.path[1];
 			var id ="";
@@ -160,8 +184,58 @@
                } 
  			   console.log('id - '+id);
 		       console.log(row_value);
+		       updateDialog.showModal();
+			   openCheck(updateDialog);
+			   console.log(updateDialog.returnValue);
 		}
+		
+		const newButton = document.getElementById('newUser');
+		const outputBox = document.querySelector('output');
+		const newDialog = document.getElementById('newDialog');
+		newDialog.returnValue = 'newOne!';
+		
+		function openCheck(newDialog){
+			if(newDialog.open){
+				console.log('Dialog open');
+			}else{
+				console.log('Dialog closed');
+			}
+		}
+		
+		function handleUserInput(returnValue){
+			if(returnValue==='Cancel'||returnValue==null){
+				alert('returnValue '+returnValue);
+			}else if(returnValue==='Confirm'){
+				alert('returnValue '+returnValue);
+			}else{
+				alert('returnValue '+returnValue);
+			}
+		}
+		
 	
+		
+			newButton.addEventListener('click',function onopen(){
+			newDialog.showModal();
+			openCheck(newDialog);
+			console.log(newDialog.returnValue);
+			
+			//handleUserInput(dialog.returnValue);
+		});
+
+			newDialog.addEventListener('close', function onClose() {
+		
+			let name = form.elements.name.value;
+			let pass = form.elements.pass.value;
+			let note = form.elements.note.value;
+			console.log(name +' '+pass+' '+note);
+			/*
+			var newform = [name,pass,note];
+			*/
+			outputBox.value = newDialog.returnValue + " button clicked - " + (new Date()).toString();
+			console.log(outputBox.value);
+		});
+		
+		
 	</script>
 </body>
 </html>

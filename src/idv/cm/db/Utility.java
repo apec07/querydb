@@ -13,9 +13,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
-import idv.cm.UserBean;
-
 import java.sql.*;
 import java.text.SimpleDateFormat;
 
@@ -30,7 +27,7 @@ public class Utility {
 		return log;
 	}
 	
-	public static void writeLogger(String className,String msg) throws SecurityException, IOException {
+	public static void writeLogger(String className,String msg) throws IOException {
 		//get currentDate&Time
 		long current = System.currentTimeMillis();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -60,7 +57,7 @@ public class Utility {
 		
 	}
 
-	public static void writeLogger(String msg)throws SecurityException, IOException {
+	public static void writeLogger(String msg)throws IOException {
 		// write to path	
 		long currentMilli = System.currentTimeMillis();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -68,7 +65,7 @@ public class Utility {
 		String currentStamp = sdf.format(date).toString();
 		Logger log1 = Logger.getLogger("MyServlet");
 	        
-	    FileHandler fileHandler = new FileHandler("d:/myLog/testLog%g.log",true);
+	    FileHandler fileHandler = new FileHandler("d:/myLogs/testLog%g.log",true);
 	    fileHandler.setLevel(Level.WARNING);
 	    fileHandler.setFormatter(new Formatter() {
 	    	 @Override
@@ -173,9 +170,9 @@ public class Utility {
 		return true;
 	}
 
-	public static HashSet<UserBean> readFromMySQL() throws SecurityException, IOException{
+	public static HashSet<UserVO> readFromMySQL() throws SecurityException, IOException{
 		
-		HashSet<UserBean> set = new LinkedHashSet<>();
+		HashSet<UserVO> set = new LinkedHashSet<>();
 		
 		 try {
 //        		Properties prop = new Properties();
@@ -185,7 +182,7 @@ public class Utility {
             ResultSet rs = stmt.executeQuery("SELECT * from account");
             
             while (rs.next()) {
-                UserBean account = new UserBean.Builder().build();
+                UserVO account = new UserVO.Builder().build();
                 int _id = rs.getInt(1);
                 String user = rs.getString(2);
                 String password = rs.getString(3);
@@ -218,7 +215,7 @@ public class Utility {
         return set;
 	}
 	
-	public static int writeToMySQL(UserBean account,int type){
+	public static int writeToMySQL(UserVO account,int type){
 		int updateNum;
 		System.out.println("WriteToMySQL account = "+account+"\n");
 		int id=account.get_id();
@@ -275,7 +272,7 @@ public class Utility {
 		return updateNum;
 	}
 	
-	public static int preparedWriteToMySQL(UserBean account,int type){
+	public static int preparedWriteToMySQL(UserVO account,int type){
 		int updateNum=0;
 		int id=account.get_id();
 		String user = account.getUserName();

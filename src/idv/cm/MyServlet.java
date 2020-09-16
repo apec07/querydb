@@ -1,7 +1,8 @@
 package idv.cm;
 
 import java.io.IOException;
-
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -14,6 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import idv.cm.db.ConnectionFactory;
+import idv.cm.db.UserJDBCDAO;
+import idv.cm.db.UserVO;
+import idv.cm.db.UserVOImp;
 import idv.cm.db.Utility;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,36 +30,41 @@ import java.util.logging.Logger;
 public class MyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	//fake data
-	private List<UserBean> list = UserBean.createUserList();
+	private List<UserVO> list = UserVO.createUserList();
 	
 	private RequestDispatcher rd;
 	public Logger log1,log2,log3;
 	
 	//retrieve from db
-	private HashSet<UserBean> valueSet;
+	private HashSet<UserVO> valueSet;
+	HashSet<UserVO> set = null;
+	private UserJDBCDAO userDao = null;
 //	private Hashtable<Integer,UserBean> table = new Hashtable<>();
 	
-	public HashSet<UserBean> getMyDb() throws SecurityException, IOException{
-		//check connection
-		boolean isConnect = Utility.connectMySQL();
-		if(isConnect) {
-			Utility.writeLogger(this.getServletInfo(),"isConnect = "+isConnect);
-            //make sure table is created!
-			Utility.writeLogger(this.getServletInfo(),"isCreateTable = "+Utility.createTable());
-			valueSet = Utility.readFromMySQL();
-			Iterator<UserBean> it = valueSet.iterator();
-			while(it.hasNext()) {
-				UserBean user = it.next();
-				Utility.writeLogger(this.getServletInfo(),"user = "+user);
-				Integer key = user.get_id();
-//				table.put(Integer.valueOf(key), user);
-			}
-			
-//			valueSet.forEach(s->System.out.println(s));
-			return valueSet;
-		}else {
+	public HashSet<UserVO> getMyDb() throws IOException{
+		
+		ConnectionFactory factory = ConnectionFactory.getInstance();
+		try(Connection con = factory.getConnection()){
+			userDao = new UserJDBCDAO();
+			set = userDao.findAll(con);
+		}catch(SQLException ex) {
+			Utility.writeLogger(this.getClass().getSimpleName(), ex.toString());
 			return null;
 		}
+		return set;
+	}
+	
+	public boolean saveMyDb(UserVO user) throws IOException {
+		ConnectionFactory factory = ConnectionFactory.getInstance();
+		try(Connection con = factory.getConnection()){
+			UserJDBCDAO userDao = new UserJDBCDAO();
+			userDao.insert(con, user);
+		}catch(SQLException ex) {
+			Utility.writeLogger(this.getClass().getSimpleName(), ex.toString());
+			return false;
+		}
+		getMyDb();
+		return true;
 	}
 	
     /**
@@ -70,7 +80,9 @@ public class MyServlet extends HttpServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		super.service(request, response);
 //		super.service(request, response);
+		
 		valueSet=getMyDb();
+		
 		request.setAttribute("listA", valueSet);
 		rd = getServletContext().getRequestDispatcher("/index.jsp");
 		rd.forward(request, response);
@@ -83,20 +95,26 @@ public class MyServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 //		HttpSession session = request.getSession();
 //		session.setAttribute(name, value);
-		
-//		  request.setAttribute("listA", list);
-//	      request.getRequestDispatcher("/index.jsp").forward(request, response);
-		valueSet = getMyDb();
-		request.setAttribute("listA", valueSet);
-		rd = getServletContext().getRequestDispatcher("/index.jsp");
-		rd.forward(request, response);
+//		valueSet = getMyDb();		
+//		request.setAttribute("listA", list);
+//	    request.getRequestDispatcher("/index.jsp").forward(request, response);
+
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		String name = request.getParameter("name");
+		String pass = request.getParameter("pass");
+		String note = request.getParameter("note");
+		UserVO user = new UserVO.Builder()
+								.userName(name)
+								.userPass(pass)
+								.userNote(note)
+								.build();
+		Utility.getLogger(this.getClass().getSimpleName(), user.toString());
+		saveMyDb(user);
 //		doGet(request, response);
 	}
 
