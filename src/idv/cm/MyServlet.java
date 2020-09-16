@@ -48,7 +48,7 @@ public class MyServlet extends HttpServlet {
 			userDao = new UserJDBCDAO();
 			set = userDao.findAll(con);
 		}catch(SQLException ex) {
-			Utility.writeLogger(this.getClass().getSimpleName(), ex.toString());
+			Utility.writeLogger("getMethod", ex.toString());
 			return null;
 		}
 		return set;
@@ -60,7 +60,33 @@ public class MyServlet extends HttpServlet {
 			UserJDBCDAO userDao = new UserJDBCDAO();
 			userDao.insert(con, user);
 		}catch(SQLException ex) {
-			Utility.writeLogger(this.getClass().getSimpleName(), ex.toString());
+			Utility.writeLogger("saveMethod", ex.toString());
+			return false;
+		}
+		getMyDb();
+		return true;
+	}
+	
+	public boolean updateMyDb(UserVO user,String idStr) throws IOException {
+		int id = Integer.parseInt(idStr);
+		ConnectionFactory factory = ConnectionFactory.getInstance();
+		try(Connection con = factory.getConnection()){
+			UserJDBCDAO userDao = new UserJDBCDAO();
+			userDao.update(con, id, user);
+		}catch(SQLException ex) {
+			Utility.writeLogger("updateMethod", ex.toString());
+			return false;
+		}
+		getMyDb();
+		return true;
+	}
+	public boolean deleteMyDb(String idStr) throws IOException{
+		int id = Integer.parseInt(idStr);
+		ConnectionFactory factory = ConnectionFactory.getInstance();
+		try(Connection con = factory.getConnection()){
+			userDao.delete(con, id);
+		}catch(SQLException ex) {
+			Utility.writeLogger("updateMethod", ex.toString());
 			return false;
 		}
 		getMyDb();
@@ -82,7 +108,6 @@ public class MyServlet extends HttpServlet {
 //		super.service(request, response);
 		
 		valueSet=getMyDb();
-		
 		request.setAttribute("listA", valueSet);
 		rd = getServletContext().getRequestDispatcher("/index.jsp");
 		rd.forward(request, response);
@@ -108,13 +133,40 @@ public class MyServlet extends HttpServlet {
 		String name = request.getParameter("name");
 		String pass = request.getParameter("pass");
 		String note = request.getParameter("note");
+		if(name==null||pass==null||note==null) {
+			Utility.getLogger("doPost", "not input anything");
+			return;
+		}
+		String type = request.getParameter("submitAction");
+		if(type==null) {
+			Utility.getLogger("doPost", "Type ==null");
+			return;
+		}
+		Utility.getLogger("doPost", "type = "+ type);
 		UserVO user = new UserVO.Builder()
-								.userName(name)
-								.userPass(pass)
-								.userNote(note)
-								.build();
-		Utility.getLogger(this.getClass().getSimpleName(), user.toString());
-		saveMyDb(user);
+				.userName(name)
+				.userPass(pass)
+				.userNote(note)
+				.build();
+		switch(type) {
+		case "New":
+			saveMyDb(user);
+			break;
+			
+		case "Update":
+			String idStr1 = request.getParameter("id");
+			updateMyDb(user,idStr1);
+			break;
+			
+		case "Delete":
+			String idStr2 = request.getParameter("id");
+			deleteMyDb(idStr2);
+			break;
+			default:
+				Utility.getLogger("doPost", "default");
+				return;
+		}
+		
 //		doGet(request, response);
 	}
 

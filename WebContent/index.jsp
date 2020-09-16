@@ -80,26 +80,27 @@
  --%>
 	<br>
 <dialog id="newDialog">
-  <form action="hello" method="post" >
+  <form action="hello" method="post" name="newdata">
     <p><label><em>New User</em></label></p>
-    <p><label>Name : </label><input type="text" id="name" name="name" placeholder=""></p>
-    <p><label>Pass : </label><input type="text" id="pass" name="pass" placeholder=""></p>
-    <p><label>Note : </label><input type="text" id="note" name="note" placeholder=""></p>
+    <p><label>Name : </label><input type="text" id="new_name" name="name" placeholder=""></p>
+    <p><label>Pass : </label><input type="text" id="new_pass" name="pass" placeholder=""></p>
+    <p><label>Note : </label><input type="text" id="new_note" name="note" placeholder=""></p>
     <menu>
       <button value="cancel">Cancel</button>
-      <input type="submit" value="Submit"></input>
+      <input type="submit" value="New" name="submitAction"></input>
     </menu>
   </form>
 </dialog>
 <dialog id="updateDialog">
-  <form action="hello" method="post" >
+  <form action="hello" method="post" name="updata">
     <p><label><em>Update</em></label></p>
-    <p><label>Name : </label><input type="text" name="name" placeholder="">${user.getUserName()}</p>
-    <p><label>Pass : </label><input type="text" name="pass" placeholder="">${user.getpass()}</p>
-    <p><label>Note : </label><input type="text" name="note" placeholder="">${user.getUserName()}</p>
+    <p hidden><label>ID : </label><input type="text" name="id" id="up_id" placeholder=""></p>
+    <p><label>Name : </label><input type="text" name="name" id="up_name" placeholder=""></p>
+    <p><label>Pass : </label><input type="text" name="pass" id="up_pass"placeholder=""></p>
+    <p><label>Note : </label><input type="text" name="note" id="up_note"placeholder=""></p>
     <menu>
-      <button value="cancel">Cancel</button>
-      <input type="submit" value="Update"></input>
+      <input type="submit" value="Delete" name="submitAction"></input>
+      <input type="submit" value="Update" name="submitAction"></input>
     </menu>
   </form>
 </dialog>
@@ -172,17 +173,27 @@
 		let tableClick=document.querySelector('.query_db');	
 		tableClick.addEventListener('click', load);
 		const updateDialog = document.getElementById('updateDialog');
+		const input_id = document.querySelector('#up_id');
+		const input_name = document.querySelector('#up_name');
+		const input_pass = document.querySelector('#up_pass');
+		const input_note = document.querySelector('#up_note');
 		function load(item){
 			var row = item.path[1];
 			var id ="";
 			var row_value="";
 			   for (var j = 0; j < row.cells.length; j++) { 
-				   id = row.cells[0].innerHTML; 
+				   input_id.value = row.cells[0].innerHTML;
+				   input_name.value = row.cells[1].innerHTML;
+				   input_pass.value = row.cells[2].innerHTML;
+				   input_note.value = row.cells[3].innerHTML;
                    row_value += row.cells[j].innerHTML; 
                    row_value += " | "; 
        
                } 
- 			   console.log('id - '+id);
+ 			   console.log('value[0] - '+input_id.value);
+ 			   console.log('value[1] - '+input_name.value);
+ 			   console.log('value[2] - '+input_pass.value);
+ 			   console.log('value[3] - '+input_note.value);
 		       console.log(row_value);
 		       updateDialog.showModal();
 			   openCheck(updateDialog);

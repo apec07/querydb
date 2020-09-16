@@ -33,7 +33,7 @@ public class UserJDBCDAO implements UserVOImp {
 	}
 
 	@Override
-	public int update(Connection con, String id, UserVO user) {
+	public int update(Connection con, int id, UserVO user) {
 		int updateCount=0;
 		String name = user.getUserName();
 		String pass = user.getUserPass();
@@ -42,7 +42,7 @@ public class UserJDBCDAO implements UserVOImp {
 			ptmt.setString(1, name);
 			ptmt.setString(2, pass);
 			ptmt.setString(3, note);
-			ptmt.setString(4, id);
+			ptmt.setInt(4, id);
 			updateCount = ptmt.executeUpdate();
 		}catch(SQLException ex) {
 			Utility.getLogger(this.getClass().getSimpleName().toString(), ex.getMessage());
@@ -51,10 +51,10 @@ public class UserJDBCDAO implements UserVOImp {
 	}
 
 	@Override
-	public int delete(Connection con, String id) {
+	public int delete(Connection con, int id) {
 		int updateCount=0;
 		try(PreparedStatement ptmt = con.prepareStatement(DELETE_STMT)){
-			ptmt.setString(1, id);
+			ptmt.setInt(1, id);
 			updateCount = ptmt.executeUpdate();
 		}catch(SQLException ex) {
 			Utility.getLogger(this.getClass().getSimpleName().toString(), ex.getMessage());
@@ -63,10 +63,10 @@ public class UserJDBCDAO implements UserVOImp {
 	}
 
 	@Override
-	public UserVO findByIndex(Connection con, String id) {
+	public UserVO findByIndex(Connection con, int id) {
 		UserVO mUser= new UserVO.Builder().build();
 		try(PreparedStatement ptmt = con.prepareStatement(GET_ONE_STMT)){
-			ptmt.setString(1, id); // ID in DB is 1,value is index
+			ptmt.setInt(1, id); // ID in DB is 1,value is index
 			rs = ptmt.executeQuery();
 			while(rs.next()) {
 				int _id = rs.getInt(1);
